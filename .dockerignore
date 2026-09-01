@@ -1,0 +1,21 @@
+# Configuração local e banco de dados: nunca dentro da imagem.
+db_config.json
+*.db
+*.db-wal
+*.db-shm
+
+.git
+.gitignore
+.claude
+__pycache__
+**/__pycache__
+*.pyc
+*.pyo
+.venv
+venv
+.env
+*.log
+Dockerfile
+.dockerignore
+docker-compose.yml
+README.md

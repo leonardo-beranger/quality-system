@@ -1,0 +1,48 @@
+name: quality-streamlit
+
+services:
+  quality:
+    build: .
+    image: quality-streamlit:latest
+    container_name: quality-streamlit
+    # Banco SQLite local: o arquivo .db mora fora da imagem, num volume
+    # nomeado, para sobreviver a rebuilds/recriações do container.
+    environment:
+      QUALITY_DB_PATH: /app/data/quality_system.db
+    volumes:
+      - quality-data:/app/data
+    # Só configuração não sensível (QUALITY_PORT). Opcional: sem .env, usa 8502.
+    env_file:
+      - path: .env
+        required: false
+    ports:
+      # Host 0.0.0.0 -> a app fica acessível pelos outros computadores da rede.
+      # A porta do host é configurável por QUALITY_PORT (o container sempre
+      # escuta em 8501); o padrão é 8502 porque 8501 pode já estar ocupada.
+      - "0.0.0.0:${QUALITY_PORT:-8502}:8501"
+    restart: unless-stopped
+
+  # Quick Tunnel do Cloudflare: expõe a app na internet com uma URL pública
+  # https://<algo-aleatorio>.trycloudflare.com, sem precisar de conta Cloudflare
+  # nem domínio. Sem conta, não dá pra travar com Cloudflare Access (login por
+  # e-mail) — a URL em si é a única barreira, então quem tiver o link acessa a
+  # tela de login da app. Fica atrás de `profile: tunnel` de propósito: o
+  # serviço principal nunca sobe exposto à internet sem pedir isso
+  # explicitamente.
+  #
+  # A URL muda a cada `docker compose up` deste serviço — pegue com:
+  #   docker compose logs cloudflared | grep trycloudflare
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: quality-cloudflared
+    # Fala com o serviço "quality" pela rede interna do compose (porta 8501,
+    # não a 8502 publicada no host) — não depende do host nem do firewall.
+    command: tunnel --no-autoupdate --url http://quality:8501
+    depends_on:
+      - quality
+    restart: unless-stopped
+    profiles:
+      - tunnel
+
+volumes:
+  quality-data:
