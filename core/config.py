@@ -7,7 +7,7 @@ Isso evita ter que caçar strings de SQL espalhadas pelas páginas.
 
 from datetime import date
 
-APP_TITLE = "Monitoreo de Calidad — BPI Quality"
+APP_TITLE = "Quality Metrics"
 
 # Nomes das tabelas do banco SQLite local (schema criado por db.py).
 TABLES = {

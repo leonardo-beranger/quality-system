@@ -15,9 +15,9 @@ TRANSLATIONS = {
     # Login
     "login_title": {"es": "Iniciar sesión", "pt": "Entrar", "en": "Sign in"},
     "login_caption": {
-        "es": "Ingrese con su correo y contraseña para acceder al Feedback Quality Monitor.",
-        "pt": "Entre com seu e-mail e senha para acessar o Feedback Quality Monitor.",
-        "en": "Sign in with your email and password to access the Feedback Quality Monitor.",
+        "es": "Ingrese con su correo y contraseña para acceder a Quality Metrics.",
+        "pt": "Entre com seu e-mail e senha para acessar o Quality Metrics.",
+        "en": "Sign in with your email and password to access Quality Metrics.",
     },
     "login_field_email": {"es": "Correo electrónico", "pt": "E-mail", "en": "Email"},
     "login_field_password": {"es": "Contraseña", "pt": "Senha", "en": "Password"},
@@ -121,7 +121,7 @@ TRANSLATIONS = {
     },
 
     # Inicio
-    "home_title": {"es": "Feedback Quality Monitor", "pt": "Feedback Quality Monitor", "en": "Feedback Quality Monitor"},
+    "home_title": {"es": "Quality Metrics", "pt": "Quality Metrics", "en": "Quality Metrics"},
     "home_caption": {
         "es": "Migración de los formularios VBA de monitoreo_calidad_v2.xlsm a Streamlit",
         "pt": "Migração dos formulários VBA de monitoreo_calidad_v2.xlsm para Streamlit",

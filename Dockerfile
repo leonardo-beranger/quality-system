@@ -1,4 +1,4 @@
-# Imagem da app Streamlit "Monitoreo de Calidad — BPI Quality".
+# Imagem da app Streamlit "Quality Metrics".
 #
 # O banco é um arquivo SQLite local (ver db.py). O caminho é resolvido por
 # db_config.json ou pela variável de ambiente QUALITY_DB_PATH — o
