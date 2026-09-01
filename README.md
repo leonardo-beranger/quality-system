@@ -1,4 +1,4 @@
-# Monitoreo de Calidad — Streamlit
+# Quality System
 
 Migração dos formulários VBA de `monitoreo_calidad_v2.xlsm` para um app Streamlit
 multipage, com um banco **SQLite local** (arquivo `.db` na própria máquina —
