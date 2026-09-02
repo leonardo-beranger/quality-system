@@ -8,9 +8,9 @@ paleta de marca (`.streamlit/config.toml`).
 
 Login por `role`: `admin` vê todas as páginas (Cadastros, Perguntas, Análises
 completo, Eliminar); `viewer` (inclui supervisores) vê Início, Dashboard,
-Análises (apenas Registrar) e Histórico de Análises. Ordem fixa do menu:
-Início → Dashboard → Cadastros → Perguntas → Análises → Histórico (as duas do
-meio somem pro viewer).
+Análises (abas Registrar e Aplicar Feedback) e Histórico de Análises. Ordem
+fixa do menu: Início → Dashboard → Cadastros → Perguntas → Análises →
+Histórico (as duas do meio somem pro viewer).
 
 ## Como rodar
 
@@ -124,9 +124,11 @@ Quality Agent, em Cadastros) recebe automaticamente a senha padrão
 há fluxo de "esqueci minha senha"; o admin precisa avisar essa senha ao
 usuário para o primeiro acesso.
 
-`viewer` vê Início, Dashboard, Análises (apenas a aba Registrar) e Histórico
-de Análises — cada página/aba admin (`registros.py`, `questions.py`, e as
-abas Editar/Aplicar Feedback/Cancelar/Eliminar de `analisis.py`) também se protege sozinha
+`viewer` vê Início, Dashboard, Análises (abas Registrar e Aplicar Feedback —
+essa última é assim que um supervisor confirma que o feedback chegou ao
+técnico, sem precisar de acesso admin) e Histórico de Análises — cada
+página/aba admin (`registros.py`, `questions.py`, e as abas Editar/Cancelar/
+Eliminar de `analisis.py`) se protege sozinha
 (`if usuario_actual()["role"] != "admin": st.stop()`), então acessar a URL
 direto não contorna a restrição. `dashboard.py` e `historial_analisis.py` são
 só leitura e não têm esse guard — abertos pra `admin` e `viewer`.
@@ -205,7 +207,7 @@ registro até o feedback chegar ao técnico. Os valores ficam sempre em
 pro nome dos pilares — ver `config.py`):
 
 1. **Registrar** cria a avaliação como `Pending` — início do processo.
-2. **Aplicar Feedback** (aba em Análises, só admin) marca `Applied` quando o
+2. **Aplicar Feedback** (aba em Análises, admin e viewer) marca `Applied` quando o
    feedback já foi repassado ao técnico — fim do processo. Só oferece o botão
    se o IDQ ainda estiver `Pending`; se já `Applied` ou `Cancelled`, avisa
    e não deixa reaplicar.

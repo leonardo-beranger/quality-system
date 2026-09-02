@@ -22,8 +22,9 @@ evaluación **sigue apareciendo, editable**, si esa evaluación ya tenía una
 respuesta para ella — así no se pierde/oculta una respuesta histórica solo
 porque el criterio fue desactivado más tarde.
 
-Solo `role == 'admin'` ve las pestañas Editar/Aplicar Feedback/Cancelar/
-Eliminar — un viewer solo registra evaluaciones nuevas.
+Um viewer vê Registrar e Aplicar Feedback — pode registrar avaliação nova e
+confirmar que o feedback chegou ao técnico. Editar/Cancelar/Eliminar são
+`role == 'admin'` apenas.
 """
 
 import re
@@ -146,9 +147,10 @@ if es_admin:
         [t("reg_title"), t("edit_title"), t("feedback_tab_title"), t("cancel_title"), t("del_title")]
     )
 else:
-    tab_registrar = st.container()
+    # Viewer também vê Aplicar Feedback — é assim que um supervisor confirma
+    # que o feedback chegou ao técnico, sem precisar de acesso admin.
+    tab_registrar, tab_feedback = st.tabs([t("reg_title"), t("feedback_tab_title")])
     tab_editar = None
-    tab_feedback = None
     tab_cancelar = None
     tab_eliminar = None
 
@@ -630,81 +632,80 @@ if es_admin:
 # Aplicar Feedback — fecha o ciclo de vida da avaliação: Registrar é o início
 # (status Pending), aplicar o feedback ao técnico é o Applied (fim).
 # ---------------------------------------------------------------------------
-if es_admin:
-    with tab_feedback:
-        st.subheader(t("feedback_subheader"), anchor=False)
-        st.info(t("feedback_info"))
+with tab_feedback:
+    st.subheader(t("feedback_subheader"), anchor=False)
+    st.info(t("feedback_info"))
 
-        idq_feedback = st.text_input(t("field_idq"), key="idq_feedback")
-        buscar_feedback = st.button(t("btn_consultar"), key="btn_buscar_feedback", disabled=not idq_feedback)
+    idq_feedback = st.text_input(t("field_idq"), key="idq_feedback")
+    buscar_feedback = st.button(t("btn_consultar"), key="btn_buscar_feedback", disabled=not idq_feedback)
 
-        if buscar_feedback:
-            estados, err_existe = run_query_safe(
-                f"""
-                SELECT DISTINCT ticketnumber, nombre_del_tecnico, status_feedback
-                FROM {T_ANALISE} WHERE id = :id
-                """,
-                {"id": idq_feedback},
-                columns=["ticketnumber", "nombre_del_tecnico", "status_feedback"],
-            )
-            if err_existe:
-                st.error(t("db_connection_error", error=err_existe))
-                estados = None
-            elif estados.empty:
-                st.error(t("err_idq_no_encontrado", idq=idq_feedback))
-                estados = None
-            st.session_state["feedback_estado_busca"] = estados if estados is not None and not estados.empty else None
-            st.session_state["feedback_idq_buscado"] = idq_feedback
+    if buscar_feedback:
+        estados, err_existe = run_query_safe(
+            f"""
+            SELECT DISTINCT ticketnumber, nombre_del_tecnico, status_feedback
+            FROM {T_ANALISE} WHERE id = :id
+            """,
+            {"id": idq_feedback},
+            columns=["ticketnumber", "nombre_del_tecnico", "status_feedback"],
+        )
+        if err_existe:
+            st.error(t("db_connection_error", error=err_existe))
+            estados = None
+        elif estados.empty:
+            st.error(t("err_idq_no_encontrado", idq=idq_feedback))
+            estados = None
+        st.session_state["feedback_estado_busca"] = estados if estados is not None and not estados.empty else None
+        st.session_state["feedback_idq_buscado"] = idq_feedback
 
-        estados = st.session_state.get("feedback_estado_busca")
-        idq_encontrado = st.session_state.get("feedback_idq_buscado")
+    estados = st.session_state.get("feedback_estado_busca")
+    idq_encontrado = st.session_state.get("feedback_idq_buscado")
 
-        if estados is not None and idq_encontrado == idq_feedback and idq_feedback:
-            fila = estados.iloc[0]
-            status_atual = ", ".join(sorted(estados["status_feedback"].dropna().astype(str).unique()))
+    if estados is not None and idq_encontrado == idq_feedback and idq_feedback:
+        fila = estados.iloc[0]
+        status_atual = ", ".join(sorted(estados["status_feedback"].dropna().astype(str).unique()))
 
-            c1, c2, c3 = st.columns(3)
-            c1.text_input(t("field_ticket").replace(" *", ""), value=str(fila["ticketnumber"] or ""), disabled=True, key="fb_h_ticket")
-            c2.text_input(t("field_tecnico_req").replace(" *", ""), value=fila["nombre_del_tecnico"] or "", disabled=True, key="fb_h_tecnico")
-            c3.text_input(t("field_status_atual"), value=status_atual, disabled=True, key="fb_h_status")
+        c1, c2, c3 = st.columns(3)
+        c1.text_input(t("field_ticket").replace(" *", ""), value=str(fila["ticketnumber"] or ""), disabled=True, key="fb_h_ticket")
+        c2.text_input(t("field_tecnico_req").replace(" *", ""), value=fila["nombre_del_tecnico"] or "", disabled=True, key="fb_h_tecnico")
+        c3.text_input(t("field_status_atual"), value=status_atual, disabled=True, key="fb_h_status")
 
-            status_unicos = set(estados["status_feedback"].dropna().unique())
-            ja_concluido = STATUS_FEEDBACK_CONCLUIDO in status_unicos
-            ja_cancelado = bool(status_unicos) and status_unicos <= {STATUS_FEEDBACK_CANCELADO}
+        status_unicos = set(estados["status_feedback"].dropna().unique())
+        ja_concluido = STATUS_FEEDBACK_CONCLUIDO in status_unicos
+        ja_cancelado = bool(status_unicos) and status_unicos <= {STATUS_FEEDBACK_CANCELADO}
 
-            if ja_concluido:
-                st.success(t("feedback_ja_concluido"))
-            elif ja_cancelado:
-                st.warning(t("feedback_cancelado_aviso"))
-            elif st.button(t("btn_aplicar_feedback"), type="primary", key="btn_confirma_feedback"):
-                operaciones = [
-                    (
-                        f"""
-                        UPDATE {T_ANALISE}
-                        SET status_feedback = :status_concluido
-                        WHERE id = :id AND status_feedback = :status_pendiente
-                        """,
-                        {
-                            "id": idq_feedback,
-                            "status_concluido": STATUS_FEEDBACK_CONCLUIDO,
-                            "status_pendiente": STATUS_FEEDBACK_PENDIENTE,
-                        },
-                    )
-                ]
-                operaciones += log_update(
-                    "ticket_analysis",
-                    idq_feedback,
-                    {"status_feedback": status_atual},
-                    {"status_feedback": STATUS_FEEDBACK_CONCLUIDO},
+        if ja_concluido:
+            st.success(t("feedback_ja_concluido"))
+        elif ja_cancelado:
+            st.warning(t("feedback_cancelado_aviso"))
+        elif st.button(t("btn_aplicar_feedback"), type="primary", key="btn_confirma_feedback"):
+            operaciones = [
+                (
+                    f"""
+                    UPDATE {T_ANALISE}
+                    SET status_feedback = :status_concluido
+                    WHERE id = :id AND status_feedback = :status_pendiente
+                    """,
+                    {
+                        "id": idq_feedback,
+                        "status_concluido": STATUS_FEEDBACK_CONCLUIDO,
+                        "status_pendiente": STATUS_FEEDBACK_PENDIENTE,
+                    },
                 )
+            ]
+            operaciones += log_update(
+                "ticket_analysis",
+                idq_feedback,
+                {"status_feedback": status_atual},
+                {"status_feedback": STATUS_FEEDBACK_CONCLUIDO},
+            )
 
-                error = run_transaction_safe(operaciones)
-                if error:
-                    st.error(t("db_connection_error", error=error))
-                else:
-                    st.cache_data.clear()
-                    st.session_state.pop("feedback_estado_busca", None)
-                    st.success(t("ok_feedback_aplicado", idq=idq_feedback))
+            error = run_transaction_safe(operaciones)
+            if error:
+                st.error(t("db_connection_error", error=error))
+            else:
+                st.cache_data.clear()
+                st.session_state.pop("feedback_estado_busca", None)
+                st.success(t("ok_feedback_aplicado", idq=idq_feedback))
 
 
 # ---------------------------------------------------------------------------

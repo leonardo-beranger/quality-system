@@ -141,7 +141,7 @@ Use el menú de la izquierda para navegar entre las páginas:
   agrupados en pilares) y genera el código IDQ.
 - Editar Análisis *(solo admin)* — carga una evaluación existente por IDQ/ticket y
   permite editar las notas y comentarios.
-- Aplicar Feedback *(solo admin)* — marca el fin del proceso (Applied) cuando el
+- Aplicar Feedback — marca el fin del proceso (Applied) cuando el
   feedback ya fue aplicado al técnico.
 - Cancelar Análisis *(solo admin)* — marca una evaluación como cancelada, sin borrarla.
 - Eliminar *(solo admin)* — eliminación definitiva de una evaluación.
@@ -164,7 +164,7 @@ Use o menu à esquerda para navegar entre as páginas:
   agrupados em pilares) e gera o código IDQ.
 - Editar Análise *(somente admin)* — carrega uma avaliação existente pelo IDQ/ticket
   e permite editar as notas e comentários.
-- Aplicar Feedback *(somente admin)* — marca o fim do processo (Applied) quando o
+- Aplicar Feedback — marca o fim do processo (Applied) quando o
   feedback já foi aplicado ao técnico.
 - Cancelar Análise *(somente admin)* — marca uma avaliação como cancelada, sem apagá-la.
 - Eliminar *(somente admin)* — remoção definitiva de uma avaliação.
@@ -187,7 +187,7 @@ Use the menu on the left to move between pages:
   grouped by pillar) and generates the IDQ code.
 - Edit Analysis *(admin only)* — loads an existing evaluation by IDQ/ticket and
   lets you edit the scores/comments.
-- Apply Feedback *(admin only)* — marks the end of the process (Applied) once
+- Apply Feedback — marks the end of the process (Applied) once
   the feedback has been applied to the technician.
 - Cancel Analysis *(admin only)* — flags an evaluation as cancelled, without deleting it.
 - Delete *(admin only)* — permanently deletes an evaluation.
