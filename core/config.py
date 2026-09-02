@@ -78,8 +78,12 @@ def sql_fecha_analisis(coluna: str = "fecha_analisis") -> str:
     )
 
 
-# Valores de `status_feedback` usados pela aplicação.
+# Valores de `status_feedback` usados pela aplicação — ciclo de vida de uma
+# avaliação: Registrar cria como PENDIENTE (início); aplicar o feedback ao
+# técnico marca como CONCLUIDO (fim do processo); Cancelar marca como
+# CANCELADO (reversível, fora do ciclo normal).
 STATUS_FEEDBACK_PENDIENTE = "Pendiente"
+STATUS_FEEDBACK_CONCLUIDO = "Concluído"
 STATUS_FEEDBACK_CANCELADO = "Cancelado"
 
 # Limite máximo do filtro de período no Historial (consulta em tela e exportação).

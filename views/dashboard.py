@@ -2,11 +2,15 @@
 
 Adaptação para o schema local: o BI original tinha uma fila de envio
 (`analise_enviadas`) e um fluxo de impugnação (`Impugnaciones`, removido desta
-app — ver views/analisis.py). Sem esses dados, os indicadores usam só o que
-`ticket_analysis.status_feedback` guarda de fato (`Pendiente` / `Cancelado`):
+app — ver views/analisis.py). Os indicadores usam o ciclo de vida real de
+`ticket_analysis.status_feedback` (ver views/analisis.py): `Pendiente`
+(início, criado ao Registrar) → `Concluído` (fim, aba "Aplicar Feedback") ou
+`Cancelado` (reversível, aba "Cancelar Análise"):
 
 - **Feedbacks Encaminhados** = total de avaliações (IDQ únicos) no período.
-- **Feedbacks Aplicados** = % de avaliações com `status_feedback != 'Cancelado'`.
+- **Feedbacks Aplicados** = % de avaliações **não canceladas** com
+  `status_feedback = 'Concluído'` — ou seja, quantas do que realmente entrou
+  no fluxo já tiveram o feedback aplicado ao técnico.
 - **Nível Qualidade** = média das notas (1=100%, 0=0%, N/A excluída),
   ponderada pelo peso do pilar de cada pergunta (`pillars.weight`), em 0-10.
 
@@ -37,7 +41,13 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-from core.config import FECHA_ANALISIS_FORMATO_PY, TABLES
+from core.config import (
+    FECHA_ANALISIS_FORMATO_PY,
+    STATUS_FEEDBACK_CANCELADO,
+    STATUS_FEEDBACK_CONCLUIDO,
+    STATUS_FEEDBACK_PENDIENTE,
+    TABLES,
+)
 from core.db import run_query_safe
 from core.i18n import t
 from core.ui import mostrar_error_db
@@ -259,7 +269,12 @@ for anio in anios_kpi:
     sub = df[df["anio"] == anio]
     sub_id = sub.drop_duplicates("id")
     encaminhados = len(sub_id)
-    aplicados_pct = (sub_id["status_feedback"] != "Cancelado").mean() * 100 if encaminhados else float("nan")
+    # % sobre as avaliações não canceladas — cancelada não entra no funil de feedback.
+    sub_id_ativos = sub_id[sub_id["status_feedback"] != STATUS_FEEDBACK_CANCELADO]
+    aplicados_pct = (
+        (sub_id_ativos["status_feedback"] == STATUS_FEEDBACK_CONCLUIDO).mean() * 100
+        if not sub_id_ativos.empty else float("nan")
+    )
     linhas_kpi.append(
         {"anio": anio, "nivel": nivel_calidad(sub), "encaminhados": encaminhados, "aplicados_pct": aplicados_pct}
     )
@@ -317,7 +332,7 @@ col_donut, col_status = st.columns([1, 1])
 
 df_id_geral = df.drop_duplicates("id")
 contagem_status = df_id_geral["status_feedback"].fillna("—").value_counts()
-cores_status = {"Pendiente": COR_TEAL, "Cancelado": COR_CINZA}
+cores_status = {STATUS_FEEDBACK_PENDIENTE: COR_AZUL, STATUS_FEEDBACK_CONCLUIDO: COR_TEAL, STATUS_FEEDBACK_CANCELADO: COR_CINZA}
 cores_donut = [cores_status.get(s, COR_AZUL) for s in contagem_status.index]
 
 with col_donut:
@@ -361,7 +376,7 @@ st.subheader(t("combo_title"), anchor=False)
 df_id_mes = df.groupby("id").agg(mes=("mes", "min"), status_feedback=("status_feedback", "first")).reset_index()
 mensal = df_id_mes.groupby("mes").agg(
     encaminhados=("id", "count"),
-    aplicados=("status_feedback", lambda s: (s != "Cancelado").sum()),
+    aplicados=("status_feedback", lambda s: (s == STATUS_FEEDBACK_CONCLUIDO).sum()),
 ).reset_index()
 calidad_mes = df.groupby("mes").apply(nivel_calidad, include_groups=False).reset_index(name="calidad")
 mensal = mensal.merge(calidad_mes, on="mes").sort_values("mes").tail(12)

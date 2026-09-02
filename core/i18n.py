@@ -141,6 +141,8 @@ Use el menú de la izquierda para navegar entre las páginas:
   agrupados en pilares) y genera el código IDQ.
 - Editar Análisis *(solo admin)* — carga una evaluación existente por IDQ/ticket y
   permite editar las notas y comentarios.
+- Aplicar Feedback *(solo admin)* — marca el fin del proceso (Concluído) cuando el
+  feedback ya fue aplicado al técnico.
 - Cancelar Análisis *(solo admin)* — marca una evaluación como cancelada, sin borrarla.
 - Eliminar *(solo admin)* — eliminación definitiva de una evaluación.
 
@@ -162,6 +164,8 @@ Use o menu à esquerda para navegar entre as páginas:
   agrupados em pilares) e gera o código IDQ.
 - Editar Análise *(somente admin)* — carrega uma avaliação existente pelo IDQ/ticket
   e permite editar as notas e comentários.
+- Aplicar Feedback *(somente admin)* — marca o fim do processo (Concluído) quando o
+  feedback já foi aplicado ao técnico.
 - Cancelar Análise *(somente admin)* — marca uma avaliação como cancelada, sem apagá-la.
 - Eliminar *(somente admin)* — remoção definitiva de uma avaliação.
 
@@ -183,6 +187,8 @@ Use the menu on the left to move between pages:
   grouped by pillar) and generates the IDQ code.
 - Edit Analysis *(admin only)* — loads an existing evaluation by IDQ/ticket and
   lets you edit the scores/comments.
+- Apply Feedback *(admin only)* — marks the end of the process (Concluído/Done) once
+  the feedback has been applied to the technician.
 - Cancel Analysis *(admin only)* — flags an evaluation as cancelled, without deleting it.
 - Delete *(admin only)* — permanently deletes an evaluation.
 
@@ -223,9 +229,9 @@ Use the menu on the left to move between pages:
     # Página agrupada "Analisis" (Registrar + Editar + Cancelar + Eliminar)
     "analisis_page_title": {"es": "Analisis", "pt": "Análises", "en": "Analysis"},
     "analisis_page_caption": {
-        "es": "Registrar una nueva evaluación de ticket o editar/consultar/cancelar/eliminar una evaluación existente.",
-        "pt": "Registrar uma nova avaliação de ticket ou editar/consultar/cancelar/eliminar uma avaliação existente.",
-        "en": "Register a new ticket evaluation, or edit/look up/cancel/delete an existing one.",
+        "es": "Registrar una nueva evaluación de ticket o editar/aplicar feedback/cancelar/eliminar una evaluación existente.",
+        "pt": "Registrar uma nova avaliação de ticket ou editar/aplicar feedback/cancelar/eliminar uma avaliação existente.",
+        "en": "Register a new ticket evaluation, or edit/apply feedback/cancel/delete an existing one.",
     },
 
     # Quality Agent
@@ -405,6 +411,47 @@ Use the menu on the left to move between pages:
         "es": "Evaluación {idq} actualizada con éxito.",
         "pt": "Avaliação {idq} atualizada com sucesso.",
         "en": "Evaluation {idq} updated successfully.",
+    },
+
+    # Aplicar Feedback (aba dentro de "Análises") — fecha o ciclo: Registrar é
+    # o início, aplicar o feedback ao técnico é o Concluído.
+    "feedback_tab_title": {"es": "Aplicar Feedback", "pt": "Aplicar Feedback", "en": "Apply Feedback"},
+    "feedback_subheader": {
+        "es": "Aplicar feedback — marca el fin del proceso",
+        "pt": "Aplicar feedback — marca o fim do processo",
+        "en": "Apply feedback — marks the end of the process",
+    },
+    "feedback_info": {
+        "es": "Registrar Análisis es el inicio del proceso (status Pendiente). Marcar el "
+        "feedback como aplicado al técnico es el Concluído — cierra el ciclo de esa "
+        "evaluación.",
+        "pt": "Registrar Análise é o início do processo (status Pendiente). Marcar o "
+        "feedback como aplicado ao técnico é o Concluído — fecha o ciclo daquela "
+        "avaliação.",
+        "en": "Registering an analysis is the start of the process (Pendiente status). "
+        "Marking the feedback as applied to the technician is the Concluído (Done) "
+        "step — it closes that evaluation's cycle.",
+    },
+    "field_status_atual": {"es": "Estado actual", "pt": "Status atual", "en": "Current status"},
+    "btn_aplicar_feedback": {
+        "es": "Marcar feedback como aplicado",
+        "pt": "Marcar feedback como aplicado",
+        "en": "Mark feedback as applied",
+    },
+    "feedback_ja_concluido": {
+        "es": "Este IDQ ya está marcado como Concluído.",
+        "pt": "Este IDQ já está marcado como Concluído.",
+        "en": "This IDQ is already marked as Concluído (Done).",
+    },
+    "feedback_cancelado_aviso": {
+        "es": "Este IDQ está Cancelado — no se puede aplicar feedback a una evaluación cancelada.",
+        "pt": "Este IDQ está Cancelado — não é possível aplicar feedback a uma avaliação cancelada.",
+        "en": "This IDQ is Cancelled — feedback can't be applied to a cancelled evaluation.",
+    },
+    "ok_feedback_aplicado": {
+        "es": "Feedback del IDQ '{idq}' marcado como aplicado (Concluído).",
+        "pt": "Feedback do IDQ '{idq}' marcado como aplicado (Concluído).",
+        "en": "Feedback for IDQ '{idq}' marked as applied (Concluído).",
     },
 
     # Cancelar Análisis (aba dentro de "Análises")

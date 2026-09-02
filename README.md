@@ -48,7 +48,7 @@ quality_system/
     ├── dashboard.py                 # Indicadores de qualidade — admin e viewer
     ├── registros.py                 # Quality Agent + Manager + Analistas (3 abas) — admin
     ├── questions.py                 # Cadastro de pilares/perguntas (2 abas) — admin
-    ├── analisis.py                  # Registrar + Editar + Cancelar + Eliminar Análise (4 abas)
+    ├── analisis.py                  # Registrar + Editar + Aplicar Feedback + Cancelar + Eliminar Análise (5 abas)
     └── historial_analisis.py        # Histórico consolidado, filtros e exportação CSV/Excel
 ```
 
@@ -126,7 +126,7 @@ usuário para o primeiro acesso.
 
 `viewer` vê Início, Dashboard, Análises (apenas a aba Registrar) e Histórico
 de Análises — cada página/aba admin (`registros.py`, `questions.py`, e as
-abas Editar/Cancelar/Eliminar de `analisis.py`) também se protege sozinha
+abas Editar/Aplicar Feedback/Cancelar/Eliminar de `analisis.py`) também se protege sozinha
 (`if usuario_actual()["role"] != "admin": st.stop()`), então acessar a URL
 direto não contorna a restrição. `dashboard.py` e `historial_analisis.py` são
 só leitura e não têm esse guard — abertos pra `admin` e `viewer`.
@@ -197,12 +197,24 @@ respondeu, aparece em branco e vira um **INSERT** ao salvar (em vez de
 **UPDATE**, já que não existe linha prévia pra esse `question_id`) — ver
 `views/analisis.py`.
 
-### Cancelar vs. Eliminar
+### Ciclo de vida de `status_feedback`
 
-Ambas são abas dentro de **Análises** (só admin). **Cancelar** marca
-`status_feedback = 'Cancelado'` nas linhas do IDQ (reversível, mantém o
-histórico). **Eliminar** apaga definitivamente as linhas do IDQ em
-`ticket_analysis`/`general_comments`. Não há undo.
+`ticket_analysis.status_feedback` acompanha o processo de uma avaliação, do
+registro até o feedback chegar ao técnico:
+
+1. **Registrar** cria a avaliação como `Pendiente` — início do processo.
+2. **Aplicar Feedback** (aba em Análises, só admin) marca `Concluído` quando o
+   feedback já foi repassado ao técnico — fim do processo. Só oferece o botão
+   se o IDQ ainda estiver `Pendiente`; se já `Concluído` ou `Cancelado`, avisa
+   e não deixa reaplicar.
+3. **Cancelar** (aba em Análises, só admin) marca `Cancelado` — reversível,
+   mantém o histórico, fora do ciclo normal.
+4. **Eliminar** (aba em Análises, só admin) apaga definitivamente as linhas do
+   IDQ em `ticket_analysis`/`general_comments`. Não há undo — distinto de
+   Cancelar, que só muda o status.
+
+O Dashboard usa esse status real: **Feedbacks Aplicados** = % de avaliações
+não canceladas com `status_feedback = 'Concluído'`.
 
 A página de **Historial de Analisis** é uma ferramenta de exportação: mostra e
 exporta `ticket_analysis` **linha a linha**, com exatamente as colunas de
