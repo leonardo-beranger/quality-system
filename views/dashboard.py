@@ -406,8 +406,8 @@ st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
 st.divider()
 
 
-def ranking_bar(titulo: str, serie: pd.Series, altura: int, cor_ini: str, cor_fim: str, casas: int = 1, top: int | None = None, key: str | None = None):
-    serie = serie.dropna().sort_values(ascending=False)
+def ranking_bar(titulo: str, serie: pd.Series, altura: int, cor_ini: str, cor_fim: str, casas: int = 1, top: int | None = None, key: str | None = None, ascending: bool = False):
+    serie = serie.dropna().sort_values(ascending=ascending)
     if top:
         serie = serie.head(top)
     st.subheader(titulo, anchor=False)
@@ -444,3 +444,11 @@ with col_c:
     ranking_bar(t("reincidencia_title"), falhas_por_pergunta, altura=300, casas=0, top=10, cor_ini=COR_VERMELHO, cor_fim=COR_GRAFITE)
 with col_d:
     ranking_bar(t("ranking_analistas_title"), df.groupby("nombre_del_tecnico").apply(nivel_calidad, include_groups=False), altura=300, top=15, cor_ini=COR_CIANO, cor_fim=COR_TEAL, key=KEY_ANALISTAS)
+
+col_e, _col_f = st.columns(2)
+with col_e:
+    ranking_bar(
+        t("ranking_piores_supervisores_title"),
+        df.groupby("manager").apply(nivel_calidad, include_groups=False),
+        altura=260, top=10, ascending=True, cor_ini=COR_VERMELHO, cor_fim=COR_GRAFITE,
+    )

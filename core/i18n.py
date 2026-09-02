@@ -622,6 +622,7 @@ Use the menu on the left to move between pages:
     "combo_title": {"es": "Feedbacks por mes", "pt": "Feedbacks por mês", "en": "Feedbacks by month"},
     "ranking_pilares_title": {"es": "Ranking - Pilares", "pt": "Ranking - Pilares", "en": "Ranking - Pillars"},
     "ranking_supervisores_title": {"es": "Ranking Supervisores", "pt": "Ranking Supervisores", "en": "Ranking Supervisors"},
+    "ranking_piores_supervisores_title": {"es": "Peores Supervisores", "pt": "Piores Supervisores", "en": "Worst Supervisors"},
     "ranking_analistas_title": {"es": "Ranking Analistas", "pt": "Ranking Analistas", "en": "Ranking Analysts"},
     "reincidencia_title": {"es": "Reincidencia", "pt": "Reincidência", "en": "Recurrence"},
 
