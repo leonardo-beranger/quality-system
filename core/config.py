@@ -78,13 +78,14 @@ def sql_fecha_analisis(coluna: str = "fecha_analisis") -> str:
     )
 
 
-# Valores de `status_feedback` usados pela aplicação — ciclo de vida de uma
-# avaliação: Registrar cria como PENDIENTE (início); aplicar o feedback ao
-# técnico marca como CONCLUIDO (fim do processo); Cancelar marca como
-# CANCELADO (reversível, fora do ciclo normal).
-STATUS_FEEDBACK_PENDIENTE = "Pendiente"
-STATUS_FEEDBACK_CONCLUIDO = "Concluído"
-STATUS_FEEDBACK_CANCELADO = "Cancelado"
+# Valores de `status_feedback` usados pela aplicação — sempre em inglês,
+# independente do idioma da interface (mesma convenção já usada pro nome dos
+# pilares): ciclo de vida de uma avaliação — Registrar cria como PENDING
+# (início); aplicar o feedback ao técnico marca como APPLIED (fim do
+# processo); Cancelar marca como CANCELLED (reversível, fora do ciclo normal).
+STATUS_FEEDBACK_PENDIENTE = "Pending"
+STATUS_FEEDBACK_CONCLUIDO = "Applied"
+STATUS_FEEDBACK_CANCELADO = "Cancelled"
 
 # Limite máximo do filtro de período no Historial (consulta em tela e exportação).
 # A tabela `ticket_analysis` tem volume muito alto: sem esse teto, uma consulta

@@ -3,10 +3,11 @@
 Equivalente a los formularios "Hacer análisis" (registro), "Cargar para Editar",
 "Cancelar" y "Eliminar" de la planilha original, agrupados en pestañas.
 
-Ciclo de vida de `status_feedback`: Registrar crea la evaluación como
-`Pendiente` (início do processo); a pestaña "Aplicar Feedback" marca como
-`Concluído` quando o feedback foi de fato repassado ao técnico (fim do
-processo); Cancelar marca como `Cancelado` (reversível, fora do ciclo normal).
+Ciclo de vida de `status_feedback` (valores sempre em inglês, ver config.py):
+Registrar cria a avaliação como `Pending` (início do processo); a aba
+"Aplicar Feedback" marca como `Applied` quando o feedback foi de fato
+repassado ao técnico (fim do processo); Cancelar marca como `Cancelled`
+(reversível, fora do ciclo normal).
 
 Las columnas de `ticket_analysis` son las declaradas en config.ANALISE_COLUMNS.
 El código de la evaluación mostrado como "IDQ" en la interfaz es la columna
@@ -627,7 +628,7 @@ if es_admin:
 
 # ---------------------------------------------------------------------------
 # Aplicar Feedback — fecha o ciclo de vida da avaliação: Registrar é o início
-# (status Pendiente), aplicar o feedback ao técnico é o Concluído (fim).
+# (status Pending), aplicar o feedback ao técnico é o Applied (fim).
 # ---------------------------------------------------------------------------
 if es_admin:
     with tab_feedback:
@@ -667,8 +668,9 @@ if es_admin:
             c2.text_input(t("field_tecnico_req").replace(" *", ""), value=fila["nombre_del_tecnico"] or "", disabled=True, key="fb_h_tecnico")
             c3.text_input(t("field_status_atual"), value=status_atual, disabled=True, key="fb_h_status")
 
-            ja_concluido = STATUS_FEEDBACK_CONCLUIDO in estados["status_feedback"].astype(str).unique()
-            ja_cancelado = all("cancel" in str(s).lower() for s in estados["status_feedback"].dropna().unique()) if not estados["status_feedback"].dropna().empty else False
+            status_unicos = set(estados["status_feedback"].dropna().unique())
+            ja_concluido = STATUS_FEEDBACK_CONCLUIDO in status_unicos
+            ja_cancelado = bool(status_unicos) and status_unicos <= {STATUS_FEEDBACK_CANCELADO}
 
             if ja_concluido:
                 st.success(t("feedback_ja_concluido"))

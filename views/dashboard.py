@@ -3,13 +3,13 @@
 Adaptação para o schema local: o BI original tinha uma fila de envio
 (`analise_enviadas`) e um fluxo de impugnação (`Impugnaciones`, removido desta
 app — ver views/analisis.py). Os indicadores usam o ciclo de vida real de
-`ticket_analysis.status_feedback` (ver views/analisis.py): `Pendiente`
-(início, criado ao Registrar) → `Concluído` (fim, aba "Aplicar Feedback") ou
-`Cancelado` (reversível, aba "Cancelar Análise"):
+`ticket_analysis.status_feedback` (valores sempre em inglês, ver config.py):
+`Pending` (início, criado ao Registrar) → `Applied` (fim, aba "Aplicar
+Feedback") ou `Cancelled` (reversível, aba "Cancelar Análise"):
 
 - **Feedbacks Encaminhados** = total de avaliações (IDQ únicos) no período.
 - **Feedbacks Aplicados** = % de avaliações **não canceladas** com
-  `status_feedback = 'Concluído'` — ou seja, quantas do que realmente entrou
+  `status_feedback = 'Applied'` — ou seja, quantas do que realmente entrou
   no fluxo já tiveram o feedback aplicado ao técnico.
 - **Nível Qualidade** = média das notas (1=100%, 0=0%, N/A excluída),
   ponderada pelo peso do pilar de cada pergunta (`pillars.weight`), em 0-10.

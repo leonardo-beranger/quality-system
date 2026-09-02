@@ -200,21 +200,25 @@ respondeu, aparece em branco e vira um **INSERT** ao salvar (em vez de
 ### Ciclo de vida de `status_feedback`
 
 `ticket_analysis.status_feedback` acompanha o processo de uma avaliação, do
-registro até o feedback chegar ao técnico:
+registro até o feedback chegar ao técnico. Os valores ficam sempre em
+**inglês**, independente do idioma da interface (mesma convenção já usada
+pro nome dos pilares — ver `config.py`):
 
-1. **Registrar** cria a avaliação como `Pendiente` — início do processo.
-2. **Aplicar Feedback** (aba em Análises, só admin) marca `Concluído` quando o
+1. **Registrar** cria a avaliação como `Pending` — início do processo.
+2. **Aplicar Feedback** (aba em Análises, só admin) marca `Applied` quando o
    feedback já foi repassado ao técnico — fim do processo. Só oferece o botão
-   se o IDQ ainda estiver `Pendiente`; se já `Concluído` ou `Cancelado`, avisa
+   se o IDQ ainda estiver `Pending`; se já `Applied` ou `Cancelled`, avisa
    e não deixa reaplicar.
-3. **Cancelar** (aba em Análises, só admin) marca `Cancelado` — reversível,
+3. **Cancelar** (aba em Análises, só admin) marca `Cancelled` — reversível,
    mantém o histórico, fora do ciclo normal.
 4. **Eliminar** (aba em Análises, só admin) apaga definitivamente as linhas do
    IDQ em `ticket_analysis`/`general_comments`. Não há undo — distinto de
    Cancelar, que só muda o status.
 
 O Dashboard usa esse status real: **Feedbacks Aplicados** = % de avaliações
-não canceladas com `status_feedback = 'Concluído'`.
+não canceladas com `status_feedback = 'Applied'`. O Historial de Analisis
+filtra pelos três valores diretamente (`Pending`/`Applied`/`Cancelled`), sem
+tradução — ver seção abaixo.
 
 A página de **Historial de Analisis** é uma ferramenta de exportação: mostra e
 exporta `ticket_analysis` **linha a linha**, com exatamente as colunas de
@@ -232,10 +236,17 @@ tetos, ambos em `config.py`:
 - `MAX_FILAS_CONSULTA` — teto de linhas por consulta (`LIMIT` no SQL), rede de
   segurança para o caso de 2 meses ainda retornarem volume excessivo.
 
-Os filtros de texto (técnico, manager, analista, ticket, IDQ) são aplicados **no
-SQL** (`LIKE`), não em pandas: o banco devolve só o necessário. O resultado é
-cacheado por 5 min (`st.cache_data`); gravações (registrar/editar/eliminar/
-cancelar) limpam esse cache para o Historial refletir a mudança na hora.
+Manager e Técnico são listas suspensas (não texto livre) — as opções vêm de
+um `SELECT DISTINCT` sobre a tabela inteira, cacheado 5 min; Técnico é em
+cascata com Manager (mesmo padrão do Dashboard: trocar o Manager restringe
+as opções de Técnico). Status também é lista suspensa, com os três valores
+reais de `status_feedback` (`Pending`/`Applied`/`Cancelled`) como opção — sem
+tradução. TicketNumber e IDQ continuam texto livre. Todos os filtros são
+aplicados **no SQL** (igualdade para Manager/Técnico/Status, `LIKE` para
+TicketNumber/IDQ), não em pandas: o banco devolve só o necessário. O
+resultado é cacheado por 5 min (`st.cache_data`); gravações
+(registrar/editar/eliminar/cancelar/aplicar feedback) limpam esse cache para
+o Historial refletir a mudança na hora.
 
 ## Diagnóstico de erro de conexão
 

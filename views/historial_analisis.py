@@ -10,8 +10,14 @@ nota, comentario, status_feedback).
 
 El período consultado está limitado a MAX_MESES_PERIODO meses: la tabla tiene
 mucho volumen, así que una consulta sin límite de fecha sería lenta/pesada —
-tanto en pantalla como en la exportación. Los filtros de texto también se
-aplican en el SQL (no en pandas), para que el banco devuelva solo lo necesario.
+tanto en pantalla como en la exportación. Los filtros se aplican en el SQL
+(no en pandas), para que el banco devuelva solo lo necesario.
+
+Manager y Técnico son listas desplegables (no texto libre) — las opciones
+vienen de un SELECT DISTINCT sobre toda la tabla, cacheado 5 min. Status usa
+los tres valores reales de `status_feedback` (siempre en inglés, ver
+config.py) directamente como opción — sin traducción, misma convención ya
+usada para el nombre de los pilares.
 """
 
 import io
@@ -26,6 +32,9 @@ from core.config import (
     FECHA_ANALISIS_FORMATO_SQL_PY,
     MAX_FILAS_CONSULTA,
     MAX_MESES_PERIODO,
+    STATUS_FEEDBACK_CANCELADO,
+    STATUS_FEEDBACK_CONCLUIDO,
+    STATUS_FEEDBACK_PENDIENTE,
     TABLES,
     sql_fecha_analisis,
 )
@@ -44,8 +53,38 @@ def _limite_inferior(data_fim) -> pd.Timestamp:
     return pd.Timestamp(data_fim) - pd.DateOffset(months=MAX_MESES_PERIODO)
 
 
-# Los filtros se muestran primero (no dependen del banco); la consulta al DW
-# se intenta después y, si falla, solo se avisa sin bloquear la página.
+@st.cache_data(ttl=300, show_spinner=False)
+def _opciones_manager():
+    df, _err = run_query_safe(
+        f"SELECT DISTINCT manager FROM {T_ANALISE} WHERE manager IS NOT NULL AND manager != '' ORDER BY manager",
+        columns=["manager"],
+    )
+    return df["manager"].tolist()
+
+
+@st.cache_data(ttl=300, show_spinner=False)
+def _opciones_tecnico(manager: str | None):
+    if manager:
+        df, _err = run_query_safe(
+            f"""
+            SELECT DISTINCT nombre_del_tecnico FROM {T_ANALISE}
+            WHERE manager = :manager AND nombre_del_tecnico IS NOT NULL AND nombre_del_tecnico != ''
+            ORDER BY nombre_del_tecnico
+            """,
+            {"manager": manager},
+            columns=["nombre_del_tecnico"],
+        )
+    else:
+        df, _err = run_query_safe(
+            f"SELECT DISTINCT nombre_del_tecnico FROM {T_ANALISE} WHERE nombre_del_tecnico IS NOT NULL AND nombre_del_tecnico != '' ORDER BY nombre_del_tecnico",
+            columns=["nombre_del_tecnico"],
+        )
+    return df["nombre_del_tecnico"].tolist()
+
+
+# Los filtros se muestran primero (no dependen del banco, salvo las opciones
+# de los desplegables); la consulta principal se intenta después y, si falla,
+# solo se avisa sin bloquear la página.
 st.subheader(t("filtros_subheader"), anchor=False)
 st.caption(t("periodo_limite_caption", meses=MAX_MESES_PERIODO))
 
@@ -59,16 +98,25 @@ periodo = c1.date_input(
     max_value=hoje,
     help=t("periodo_help", meses=MAX_MESES_PERIODO),
 )
-tecnico_filtro = c2.text_input(t("field_tecnico_req").replace(" *", ""))
-manager_filtro = c3.text_input(t("field_manager_filtro"))
-analista_filtro = c4.text_input(t("field_analista_filtro"))
 
-c5, c6, c7 = st.columns(3)
+manager_opts = [t("opt_todos")] + _opciones_manager()
+manager_filtro = c2.selectbox(t("field_manager_filtro"), manager_opts)
+
+# Cascata: as opções de Técnico dependem do Manager escolhido — mesma chave
+# variável usada no Dashboard, pra resetar o Técnico quando o Manager muda em
+# vez de tentar validar contra uma lista de opções que já mudou.
+manager_para_tecnico = manager_filtro if manager_filtro != t("opt_todos") else None
+tecnico_opts = [t("opt_todos")] + _opciones_tecnico(manager_para_tecnico)
+tecnico_filtro = c3.selectbox(
+    t("field_tecnico_req").replace(" *", ""), tecnico_opts, key=f"hist_tecnico_{manager_filtro}"
+)
+
+status_opts = [t("opt_todos"), STATUS_FEEDBACK_PENDIENTE, STATUS_FEEDBACK_CONCLUIDO, STATUS_FEEDBACK_CANCELADO]
+status_filtro = c4.selectbox(t("field_status_filtro"), status_opts)
+
+c5, c6 = st.columns(2)
 ticket_filtro = c5.text_input(t("field_ticket").replace(" *", ""))
 idq_filtro = c6.text_input(t("field_idq"))
-status_cancelado = c7.selectbox(
-    t("field_status_filtro"), [t("opt_todos"), t("opt_solo_activos"), t("opt_solo_cancelados")]
-)
 
 # `date_input` con rango devuelve 1 sola fecha mientras el usuario no eligió la
 # segunda: en ese caso se espera, en vez de consultar un período incompleto.
@@ -96,14 +144,13 @@ if data_ini < limite:
         )
     )
 
-# Filtros de texto empujados al SQL: el banco filtra e devuelve solo lo
-# necesario. `fecha_analisis` es texto ('DD/MM/YYYY HH:MM') — comparar la
-# columna cruda con una fecha sería una comparación lexicográfica incorrecta.
-# Se reordena con sql_fecha_analisis() antes de comparar, y los parámetros de
-# fecha se formatean igual ('YYYY-MM-DD HH:MM') para que la comparación de
-# texto sea equivalente a una comparación cronológica. El límite superior es
-# exclusivo sobre el día siguiente — con BETWEEN se perderían los registros del
-# último día con hora distinta de 00:00.
+# `fecha_analisis` es texto ('DD/MM/YYYY HH:MM') — comparar la columna cruda
+# con una fecha sería una comparación lexicográfica incorrecta. Se reordena
+# con sql_fecha_analisis() antes de comparar, y los parámetros de fecha se
+# formatean igual ('YYYY-MM-DD HH:MM') para que la comparación de texto sea
+# equivalente a una comparación cronológica. El límite superior es exclusivo
+# sobre el día siguiente — con BETWEEN se perderían los registros del último
+# día con hora distinta de 00:00.
 FECHA_EXPR = sql_fecha_analisis()
 condiciones = [f"{FECHA_EXPR} >= :data_ini", f"{FECHA_EXPR} < :data_fim"]
 params = {
@@ -112,10 +159,19 @@ params = {
     "limite": MAX_FILAS_CONSULTA + 1,
 }
 
+# Manager/Técnico vienen de un desplegable (valor exacto de la base) — se
+# comparan con igualdad. TicketNumber/IDQ siguen siendo texto libre — LIKE.
+if manager_filtro != t("opt_todos"):
+    condiciones.append("manager = :manager")
+    params["manager"] = manager_filtro
+if tecnico_filtro != t("opt_todos"):
+    condiciones.append("nombre_del_tecnico = :nombre_del_tecnico")
+    params["nombre_del_tecnico"] = tecnico_filtro
+if status_filtro != t("opt_todos"):
+    condiciones.append("status_feedback = :status_feedback")
+    params["status_feedback"] = status_filtro
+
 for columna, valor in [
-    ("nombre_del_tecnico", tecnico_filtro),
-    ("manager", manager_filtro),
-    ("analista_quality", analista_filtro),
     ("ticketnumber", ticket_filtro),
     ("id", idq_filtro),
 ]:
@@ -162,17 +218,6 @@ if not dados.empty:
     dados["fecha_analisis"] = pd.to_datetime(
         dados["fecha_analisis"], format=FECHA_ANALISIS_FORMATO_PY, errors="coerce"
     )
-
-# El estado "cancelado" es por evaluación: basta que una línea del id_number
-# tenga status_feedback con 'cancel' para que las demás líneas de esa misma
-# evaluación también se consideren canceladas.
-if not dados.empty:
-    cancelado_por_linha = dados["status_feedback"].fillna("").str.contains("cancel", case=False)
-    esta_cancelado = cancelado_por_linha.groupby(dados["id_number"]).transform("any")
-    if status_cancelado == t("opt_solo_activos"):
-        dados = dados[~esta_cancelado]
-    elif status_cancelado == t("opt_solo_cancelados"):
-        dados = dados[esta_cancelado]
 
 st.subheader(t("resultado_subheader", n=len(dados)), anchor=False)
 st.dataframe(dados, use_container_width=True, hide_index=True)

@@ -141,7 +141,7 @@ Use el menú de la izquierda para navegar entre las páginas:
   agrupados en pilares) y genera el código IDQ.
 - Editar Análisis *(solo admin)* — carga una evaluación existente por IDQ/ticket y
   permite editar las notas y comentarios.
-- Aplicar Feedback *(solo admin)* — marca el fin del proceso (Concluído) cuando el
+- Aplicar Feedback *(solo admin)* — marca el fin del proceso (Applied) cuando el
   feedback ya fue aplicado al técnico.
 - Cancelar Análisis *(solo admin)* — marca una evaluación como cancelada, sin borrarla.
 - Eliminar *(solo admin)* — eliminación definitiva de una evaluación.
@@ -164,7 +164,7 @@ Use o menu à esquerda para navegar entre as páginas:
   agrupados em pilares) e gera o código IDQ.
 - Editar Análise *(somente admin)* — carrega uma avaliação existente pelo IDQ/ticket
   e permite editar as notas e comentários.
-- Aplicar Feedback *(somente admin)* — marca o fim do processo (Concluído) quando o
+- Aplicar Feedback *(somente admin)* — marca o fim do processo (Applied) quando o
   feedback já foi aplicado ao técnico.
 - Cancelar Análise *(somente admin)* — marca uma avaliação como cancelada, sem apagá-la.
 - Eliminar *(somente admin)* — remoção definitiva de uma avaliação.
@@ -187,7 +187,7 @@ Use the menu on the left to move between pages:
   grouped by pillar) and generates the IDQ code.
 - Edit Analysis *(admin only)* — loads an existing evaluation by IDQ/ticket and
   lets you edit the scores/comments.
-- Apply Feedback *(admin only)* — marks the end of the process (Concluído/Done) once
+- Apply Feedback *(admin only)* — marks the end of the process (Applied) once
   the feedback has been applied to the technician.
 - Cancel Analysis *(admin only)* — flags an evaluation as cancelled, without deleting it.
 - Delete *(admin only)* — permanently deletes an evaluation.
@@ -414,7 +414,7 @@ Use the menu on the left to move between pages:
     },
 
     # Aplicar Feedback (aba dentro de "Análises") — fecha o ciclo: Registrar é
-    # o início, aplicar o feedback ao técnico é o Concluído.
+    # o início, aplicar o feedback ao técnico é o Applied.
     "feedback_tab_title": {"es": "Aplicar Feedback", "pt": "Aplicar Feedback", "en": "Apply Feedback"},
     "feedback_subheader": {
         "es": "Aplicar feedback — marca el fin del proceso",
@@ -422,14 +422,14 @@ Use the menu on the left to move between pages:
         "en": "Apply feedback — marks the end of the process",
     },
     "feedback_info": {
-        "es": "Registrar Análisis es el inicio del proceso (status Pendiente). Marcar el "
-        "feedback como aplicado al técnico es el Concluído — cierra el ciclo de esa "
+        "es": "Registrar Análisis es el inicio del proceso (status Pending). Marcar el "
+        "feedback como aplicado al técnico es el Applied — cierra el ciclo de esa "
         "evaluación.",
-        "pt": "Registrar Análise é o início do processo (status Pendiente). Marcar o "
-        "feedback como aplicado ao técnico é o Concluído — fecha o ciclo daquela "
+        "pt": "Registrar Análise é o início do processo (status Pending). Marcar o "
+        "feedback como aplicado ao técnico é o Applied — fecha o ciclo daquela "
         "avaliação.",
-        "en": "Registering an analysis is the start of the process (Pendiente status). "
-        "Marking the feedback as applied to the technician is the Concluído (Done) "
+        "en": "Registering an analysis is the start of the process (Pending status). "
+        "Marking the feedback as applied to the technician is the Applied "
         "step — it closes that evaluation's cycle.",
     },
     "field_status_atual": {"es": "Estado actual", "pt": "Status atual", "en": "Current status"},
@@ -439,19 +439,19 @@ Use the menu on the left to move between pages:
         "en": "Mark feedback as applied",
     },
     "feedback_ja_concluido": {
-        "es": "Este IDQ ya está marcado como Concluído.",
-        "pt": "Este IDQ já está marcado como Concluído.",
-        "en": "This IDQ is already marked as Concluído (Done).",
+        "es": "Este IDQ ya está marcado como Applied.",
+        "pt": "Este IDQ já está marcado como Applied.",
+        "en": "This IDQ is already marked as Applied.",
     },
     "feedback_cancelado_aviso": {
-        "es": "Este IDQ está Cancelado — no se puede aplicar feedback a una evaluación cancelada.",
-        "pt": "Este IDQ está Cancelado — não é possível aplicar feedback a uma avaliação cancelada.",
+        "es": "Este IDQ está Cancelled — no se puede aplicar feedback a una evaluación cancelada.",
+        "pt": "Este IDQ está Cancelled — não é possível aplicar feedback a uma avaliação cancelada.",
         "en": "This IDQ is Cancelled — feedback can't be applied to a cancelled evaluation.",
     },
     "ok_feedback_aplicado": {
-        "es": "Feedback del IDQ '{idq}' marcado como aplicado (Concluído).",
-        "pt": "Feedback do IDQ '{idq}' marcado como aplicado (Concluído).",
-        "en": "Feedback for IDQ '{idq}' marked as applied (Concluído).",
+        "es": "Feedback del IDQ '{idq}' marcado como aplicado (Applied).",
+        "pt": "Feedback do IDQ '{idq}' marcado como aplicado (Applied).",
+        "en": "Feedback for IDQ '{idq}' marked as Applied.",
     },
 
     # Cancelar Análisis (aba dentro de "Análises")
@@ -462,14 +462,14 @@ Use the menu on the left to move between pages:
         "en": "Cancel — reversible, keeps history",
     },
     "cancelar_info": {
-        "es": "No borra nada: marca `status_feedback = 'Cancelado'` en las líneas de ese IDQ "
-        "(es lo que lee el filtro \"Solo cancelados\" del Historial) y guarda el motivo en "
+        "es": "No borra nada: marca `status_feedback = 'Cancelled'` en las líneas de ese IDQ "
+        "(es lo que el filtro de Status del Historial usa) y guarda el motivo en "
         "`general_comments`.",
-        "pt": "Não apaga nada: marca `status_feedback = 'Cancelado'` nas linhas daquele IDQ "
-        "(é o que o filtro \"Somente cancelados\" do Histórico lê) e grava o motivo em "
+        "pt": "Não apaga nada: marca `status_feedback = 'Cancelled'` nas linhas daquele IDQ "
+        "(é o que o filtro de Status do Histórico usa) e grava o motivo em "
         "`general_comments`.",
-        "en": "Deletes nothing: flags `status_feedback = 'Cancelado'` on that IDQ's rows (which is "
-        "what the History's \"Only cancelled\" filter reads) and saves the reason in "
+        "en": "Deletes nothing: flags `status_feedback = 'Cancelled'` on that IDQ's rows (which is "
+        "what the History's Status filter uses) and saves the reason in "
         "`general_comments`.",
     },
     "field_motivacion": {"es": "Motivación", "pt": "Motivación", "en": "Reason"},
@@ -635,11 +635,8 @@ Use the menu on the left to move between pages:
     "filtros_subheader": {"es": "Filtros", "pt": "Filtros", "en": "Filters"},
     "field_periodo": {"es": "fecha_analisis", "pt": "fecha_analisis", "en": "fecha_analisis"},
     "field_manager_filtro": {"es": "Manager", "pt": "Manager", "en": "Manager"},
-    "field_analista_filtro": {"es": "Analista Quality", "pt": "Analista Quality", "en": "Quality Analyst"},
     "field_status_filtro": {"es": "Estado", "pt": "Status", "en": "Status"},
     "opt_todos": {"es": "Todos", "pt": "Todos", "en": "All"},
-    "opt_solo_activos": {"es": "Solo activos", "pt": "Somente ativos", "en": "Active only"},
-    "opt_solo_cancelados": {"es": "Solo cancelados", "pt": "Somente cancelados", "en": "Cancelled only"},
     "resultado_subheader": {"es": "Resultado ({n} líneas)", "pt": "Resultado ({n} linhas)", "en": "Result ({n} rows)"},
     "exportacion_subheader": {"es": "Exportación", "pt": "Exportação", "en": "Export"},
     "btn_export_csv": {"es": "Exportar CSV", "pt": "Exportar CSV", "en": "Export CSV"},
