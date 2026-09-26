@@ -12,6 +12,10 @@ Análises (abas Registrar e Aplicar Feedback) e Histórico de Análises. Ordem
 fixa do menu: Início → Dashboard → Cadastros → Perguntas → Análises →
 Histórico (as duas do meio somem pro viewer).
 
+## Manual de uso
+
+Guia completo, da instalação ao uso real, com prints: **[docs/MANUAL.md](docs/MANUAL.md)**.
+
 ## Como rodar
 
 ```bash
@@ -33,8 +37,8 @@ o script cria o schema se precisar):
 python scripts/create_admin.py --email voce@empresa.com --name "Seu Nome"
 ```
 
-A senha é a padrão `quality_{ano_atual}` (ou passe `--password`). Troque depois
-do primeiro login. Dentro do Docker:
+A senha é a padrão `quality_{ano_atual}`, previsível: passe `--password` para
+definir uma própria (o app ainda não tem tela de troca de senha). Dentro do Docker:
 `docker compose exec quality python scripts/create_admin.py --email voce@empresa.com`.
 
 ### Dados de demonstração (opcional)

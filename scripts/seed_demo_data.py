@@ -193,7 +193,7 @@ def main() -> int:
         f"Supervisores: {len(managers)} | Técnicos: {len(tecnicos)} | Contas viewer: {len(contas)} | "
         f"Avaliações: {n_avaliacoes} ({len(linhas)} linhas)"
     )
-    print(f"Senha padrão das contas viewer: {senha_padrao()} (troque em produção).")
+    print(f"Senha padrão das contas viewer: {senha_padrao()} (dados de demonstração, não use em produção).")
     return 0
 
 

@@ -6,8 +6,9 @@ sem isso ninguém consegue logar. Uso (na raiz do projeto):
     python scripts/create_admin.py --email voce@empresa.com --name "Seu Nome"
 
 Sem --password usa a senha padrão `quality_{ano_atual}` (a mesma de um usuário
-novo em Cadastros). Troque depois do primeiro login. Não sobrescreve nada: se o
-e-mail já existe, aborta.
+novo em Cadastros), que é previsível: defina uma senha própria com --password.
+O app ainda não tem tela de troca de senha. Não sobrescreve nada: se o e-mail
+já existe, aborta.
 """
 
 import argparse
@@ -50,7 +51,7 @@ def main() -> int:
             {"id": proximo_id, "name": args.name, "email": email, "hash": auth.hash_password(senha)},
         )
 
-    print(f"Admin criado: {email} (id {proximo_id}). Troque a senha após o primeiro login.")
+    print(f"Admin criado: {email} (id {proximo_id}).")
     return 0
 
 
