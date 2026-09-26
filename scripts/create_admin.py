@@ -6,9 +6,8 @@ sem isso ninguém consegue logar. Uso (na raiz do projeto):
     python scripts/create_admin.py --email voce@empresa.com --name "Seu Nome"
 
 Sem --password usa a senha padrão `quality_{ano_atual}` (a mesma de um usuário
-novo em Cadastros), que é previsível: defina uma senha própria com --password.
-O app ainda não tem tela de troca de senha. Não sobrescreve nada: se o e-mail
-já existe, aborta.
+novo em Cadastros), que é previsível: defina uma senha própria com --password ou troque-a em
+Início depois de entrar. Não sobrescreve nada: se o e-mail já existe, aborta.
 """
 
 import argparse

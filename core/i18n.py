@@ -685,6 +685,68 @@ Use the menu on the left to move between pages:
         "pt": "Período {desde} a {hasta} — {lineas} linhas (1 linha por critério avaliado).",
         "en": "Period {desde} to {hasta} — {lineas} rows (1 row per evaluated criterion).",
     },
+    # --- Senha (troca pelo próprio usuário / redefinição pelo admin) ---
+    "pwd_subheader": {"es": "Cambiar mi contraseña", "pt": "Alterar minha senha", "en": "Change my password"},
+    "pwd_caption": {
+        "es": "Mínimo {min} caracteres. No puede ser la contraseña estándar.",
+        "pt": "Mínimo de {min} caracteres. Não pode ser a senha padrão.",
+        "en": "At least {min} characters. It cannot be the default password.",
+    },
+    "pwd_aviso_padrao": {
+        "es": "Usted todavía usa la contraseña estándar. Cámbiela abajo.",
+        "pt": "Você ainda usa a senha padrão. Altere abaixo.",
+        "en": "You are still using the default password. Change it below.",
+    },
+    "pwd_field_atual": {"es": "Contraseña actual", "pt": "Senha atual", "en": "Current password"},
+    "pwd_field_nueva": {"es": "Contraseña nueva", "pt": "Nova senha", "en": "New password"},
+    "pwd_field_confirma": {"es": "Confirmar contraseña nueva", "pt": "Confirmar nova senha", "en": "Confirm new password"},
+    "pwd_btn": {"es": "Cambiar contraseña", "pt": "Alterar senha", "en": "Change password"},
+    "pwd_ok": {"es": "Contraseña cambiada.", "pt": "Senha alterada.", "en": "Password changed."},
+    "pwd_error_no_coincide": {
+        "es": "La confirmación no coincide con la contraseña nueva.",
+        "pt": "A confirmação não confere com a nova senha.",
+        "en": "The confirmation does not match the new password.",
+    },
+    "pwd_error_curta": {
+        "es": "La contraseña nueva es demasiado corta.",
+        "pt": "A nova senha é curta demais.",
+        "en": "The new password is too short.",
+    },
+    "pwd_error_padrao": {
+        "es": "La contraseña nueva no puede ser la contraseña estándar.",
+        "pt": "A nova senha não pode ser a senha padrão.",
+        "en": "The new password cannot be the default password.",
+    },
+    "pwd_error_atual": {
+        "es": "La contraseña actual es incorrecta.",
+        "pt": "A senha atual está incorreta.",
+        "en": "The current password is incorrect.",
+    },
+    "pwd_error_igual": {
+        "es": "La contraseña nueva debe ser distinta de la actual.",
+        "pt": "A nova senha deve ser diferente da atual.",
+        "en": "The new password must be different from the current one.",
+    },
+    "pwd_error_db": {
+        "es": "No se pudo guardar la contraseña. Intente de nuevo.",
+        "pt": "Não foi possível salvar a senha. Tente de novo.",
+        "en": "Could not save the password. Try again.",
+    },
+    "qa_reset_btn": {
+        "es": "Restablecer contraseña estándar",
+        "pt": "Redefinir para a senha padrão",
+        "en": "Reset to default password",
+    },
+    "qa_reset_help": {
+        "es": "Vuelve la contraseña del usuario cargado a la estándar del año.",
+        "pt": "Volta a senha do usuário carregado para a padrão do ano.",
+        "en": "Sets the loaded user's password back to this year's default.",
+    },
+    "qa_reset_ok": {
+        "es": "Contraseña de '{nombre}' restablecida a **{senha}**. Avísele.",
+        "pt": "Senha de '{nombre}' redefinida para **{senha}**. Avise o usuário.",
+        "en": "Password of '{nombre}' reset to **{senha}**. Let them know.",
+    },
 }
 
 

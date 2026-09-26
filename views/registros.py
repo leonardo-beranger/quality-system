@@ -13,6 +13,7 @@ from datetime import datetime
 import pandas as pd
 import streamlit as st
 
+from core.account import redefinir_senha_padrao
 from core.auth import hash_password, usuario_actual
 from core.config import REGION_OPTIONS, ROLE_OPTIONS, STATUS_OPTIONS, TABLES, senha_padrao
 from core.db import run_query_safe, run_statement_safe, run_transaction_safe, siguiente_id
@@ -147,6 +148,15 @@ with tab_quality_agent:
                     else:
                         st.success(t("ok_analista_actualizado", nombre=seleccionado))
                         st.rerun()
+
+        # Sem fluxo de "esqueci minha senha": o admin volta a senha do usuário
+        # carregado para a padrão do ano, e o usuário a troca em Início.
+        if seleccionado and st.button(t("qa_reset_btn"), help=t("qa_reset_help"), key="qa_reset_senha"):
+            error = redefinir_senha_padrao(seleccionado)
+            if error:
+                st.error(error)
+            else:
+                st.success(t("qa_reset_ok", nombre=seleccionado, senha=senha_padrao()))
 
     with col_list:
         st.markdown(f"**{t('current_list_subheader')}**")

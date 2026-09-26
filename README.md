@@ -38,7 +38,8 @@ python scripts/create_admin.py --email voce@empresa.com --name "Seu Nome"
 ```
 
 A senha é a padrão `quality_{ano_atual}`, previsível: passe `--password` para
-definir uma própria (o app ainda não tem tela de troca de senha). Dentro do Docker:
+definir uma própria, ou troque-a em **Início → Alterar minha senha** depois de
+entrar. Dentro do Docker:
 `docker compose exec quality python scripts/create_admin.py --email voce@empresa.com`.
 
 ### Dados de demonstração (opcional)
@@ -71,6 +72,7 @@ quality_system/
 │   ├── db.py                        # Conexão genérica com o SQLite local (SQLAlchemy) + criação do schema
 │   ├── config.py                    # Nomes de tabelas + catálogo padrão de critérios/pilares (seed)
 │   ├── auth.py                      # Login, sessão (cookie), hash de senha
+│   ├── account.py                   # Troca de senha (usuário) e redefinição (admin)
 │   ├── i18n.py                      # Textos ES/PT/EN + seletor de idioma (sidebar)
 │   ├── log.py                       # Auditoria (activity_log) — 1 linha por coluna alterada
 │   └── ui.py                        # Helpers visuais compartilhados (tema, logo, erro de conexão)
@@ -151,9 +153,13 @@ todas as páginas da sessão.
 
 `quality_agent.role` guarda `'admin'` ou `'viewer'`. Um usuário novo (aba
 Quality Agent, em Cadastros) recebe automaticamente a senha padrão
-`quality_{ano_atual}` (ex.: `quality_2026`, ver `config.senha_padrao()`) — não
-há fluxo de "esqueci minha senha"; o admin precisa avisar essa senha ao
-usuário para o primeiro acesso.
+`quality_{ano_atual}` (ex.: `quality_2026`, ver `config.senha_padrao()`) — o
+admin precisa avisar essa senha ao usuário para o primeiro acesso. Cada usuário
+troca a própria senha em **Início → Alterar minha senha** (`core/account.py`:
+mínimo de 8 caracteres, diferente da atual e da padrão; a troca vai para o
+`activity_log` sem gravar a senha). Não há "esqueci minha senha" por e-mail: em
+**Cadastros → Quality Agent** o admin usa **Redefinir para a senha padrão** no
+usuário carregado.
 
 `viewer` vê Início, Dashboard, Análises (abas Registrar e Aplicar Feedback —
 essa última é assim que um supervisor confirma que o feedback chegou ao

@@ -103,8 +103,7 @@ No Docker:
 docker compose exec quality python scripts/create_admin.py --email voce@empresa.com --name "Seu Nome" --password "UmaSenhaForte"
 ```
 
-- Sem `--password`, a senha é a padrão `quality_{ano_atual}` (ex.: `quality_2026`).
-- **Defina uma senha própria no admin.** Não existe tela de troca de senha no app (ver [Limitações](#11-limitações-conhecidas)).
+- Sem `--password`, a senha é a padrão `quality_{ano_atual}` (ex.: `quality_2026`). Ela é previsível: defina uma própria com `--password` ou troque logo após entrar (seção [5.6](#56-alterar-a-própria-senha)).
 - O script não sobrescreve nada: se o e-mail já existir, ele aborta.
 
 **Dados de demonstração (opcional).** Para explorar o app com dados prontos, num banco **vazio** (só com o admin criado):
@@ -113,7 +112,7 @@ docker compose exec quality python scripts/create_admin.py --email voce@empresa.
 python scripts/seed_demo_data.py
 ```
 
-Gera 10 supervisores, 100 técnicos, 13 contas viewer e 300 a 700 avaliações fictícias, de 2024-01 a 2026-08. Só adiciona: se já houver supervisores ou técnicos, aborta sem alterar nada. As contas viewer criadas usam a senha padrão `quality_{ano_atual}`.
+Gera 10 supervisores, 100 técnicos, 13 contas viewer e 300 a 700 avaliações fictícias, de 2024-01 a 2026-08. Só adiciona: se já houver supervisores ou técnicos, aborta sem alterar nada. As contas viewer criadas usam a senha padrão `quality_{ano_atual}`, e cada usuário pode trocá-la em **Início**.
 
 **Entrar.** Abra o endereço do app, informe e-mail e senha e clique em **Entrar**. A sessão sobrevive a recarregar a página (F5). Para sair, use o botão **Sair** na barra lateral.
 
@@ -150,7 +149,7 @@ Nível de Qualidade = Σ (nota × peso do pilar) ÷ Σ (pesos dos critérios res
 
 Menu **Cadastros**, com três abas:
 
-1. **Quality Agent:** os usuários do sistema (admin ou viewer). Informe nome, e-mail, status e perfil. O usuário novo entra com a senha padrão `quality_{ano}`, que o admin precisa comunicar.
+1. **Quality Agent:** os usuários do sistema (admin ou viewer). Informe nome, e-mail, status e perfil. O usuário novo entra com a senha padrão `quality_{ano}`, que o admin precisa comunicar. Se um usuário esquecer a senha, o admin seleciona o usuário na lista e clica em **Redefinir para a senha padrão**; o usuário volta a entrar com a padrão e a troca em **Início**.
 2. **Manager:** os supervisores (tabela de referência).
 3. **Analistas (técnicos):** os técnicos avaliados, ligados a um manager, com região e status.
 
@@ -207,6 +206,17 @@ Prefira **Cancelar** a **Eliminar**: cancelar preserva o histórico.
 
 Toda alteração é gravada na tabela de auditoria `activity_log`, com uma linha por coluna alterada.
 
+### 5.6 Alterar a própria senha
+
+Menu **Início**, seção **Alterar minha senha** (qualquer usuário logado).
+
+![Alterar minha senha](img/alterar-senha.png)
+
+1. Informe a **senha atual**, a **nova senha** e a **confirmação**.
+2. Clique em **Alterar senha**.
+
+Regras da nova senha: no mínimo 8 caracteres, diferente da atual e diferente da senha padrão do ano. Se você ainda usa a senha padrão, o app mostra um aviso nessa tela. A troca fica registrada na auditoria (`activity_log`) sem guardar a senha.
+
 ## 6. Dashboard: como ler
 
 Menu **Dashboard** (admin e viewer).
@@ -256,6 +266,8 @@ Menu **Histórico de Análises** (admin e viewer). Mostra as avaliações **linh
 | Análises → Aplicar Feedback | ✔ | ✔ |
 | Análises → Editar / Cancelar / Eliminar | ✔ | ✖ |
 | Histórico de Análises | ✔ | ✔ |
+| Alterar a própria senha (Início) | ✔ | ✔ |
+| Redefinir a senha de outro usuário (Cadastros) | ✔ | ✖ |
 
 A restrição é aplicada em cada página, então digitar a URL diretamente não contorna as permissões.
 
@@ -292,7 +304,8 @@ O banco é preservado. O schema é criado e atualizado automaticamente na primei
 
 | Sintoma | Causa provável | O que fazer |
 |---|---|---|
-| Não consigo entrar | Não existe usuário no banco novo, ou e-mail/senha incorretos. | Crie o admin com `scripts/create_admin.py` (seção 3). A senha padrão é `quality_{ano}`. |
+| Não consigo entrar | Não existe usuário no banco novo, ou e-mail/senha incorretos. | Banco novo: crie o admin com `scripts/create_admin.py` (seção 3). Esqueceu a senha: peça a um admin para redefinir para a padrão (`quality_{ano}`). |
+| Esqueci a senha do único admin | Não há outro admin para redefinir. | Crie outro admin com `scripts/create_admin.py --email outro@empresa.com` e redefina a senha do primeiro por ele. |
 | A página Início mostra erro de banco | Arquivo inacessível, bloqueado por outro processo ou somente leitura. | Leia a causa provável mostrada na tela, corrija o caminho ou a permissão e clique em **Recargar configuración**. |
 | Mudei o `db_config.json` e nada mudou | O app guarda a conexão em cache. | Clique em **Recargar configuración** na página Início ou reinicie o app. |
 | Dados sumiram ou o banco corrompeu | Banco em pasta sincronizada (OneDrive etc.) ou arquivos `-wal`/`-shm` apagados à mão. | Restaure o backup e mova o banco para fora da pasta sincronizada. Nunca apague `-wal`/`-shm`. |
@@ -303,7 +316,7 @@ O banco é preservado. O schema é criado e atualizado automaticamente na primei
 
 ## 11. Limitações conhecidas
 
-- **Sem tela de troca ou recuperação de senha.** Usuários criados em Cadastros entram com a senha padrão `quality_{ano}`, que é previsível, e o app não oferece como alterá-la. Use o app numa rede confiável e defina uma senha própria ao criar o admin (`--password`). Só o script `create_admin.py` aceita senha personalizada.
+- **Sem recuperação automática de senha.** Não há "esqueci minha senha" por e-mail. Quem esquece a senha depende de um admin para redefini-la para a padrão `quality_{ano}`, e o usuário precisa trocá-la em **Início**. Como a senha padrão é previsível, oriente cada usuário novo a trocá-la no primeiro acesso.
 - **SQLite:** ótimo para um time pequeno e para começar (zero infraestrutura). Escrita concorrente intensa, com muitos usuários gravando ao mesmo tempo, pede um banco de servidor como o PostgreSQL.
 - **Volume de dados:** o Histórico limita a consulta a 2 meses por vez, por causa do volume.
 - **Critérios em português:** o texto dos critérios e comentários é dado do catálogo, não muda com o idioma da interface. Os nomes dos pilares e os status são sempre em inglês.
