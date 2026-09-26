@@ -23,6 +23,30 @@ Não precisa configurar nada: na primeira execução, `db.py` cria o arquivo
 `quality_system.db` (na raiz do projeto) e todas as tabelas automaticamente.
 Para usar outro caminho, veja "Banco de dados" abaixo.
 
+### Primeiro acesso (banco novo)
+
+Um banco recém-criado tem o catálogo de pilares/perguntas, mas **nenhum
+usuário**. Crie o primeiro admin (com o app já iniciado uma vez, ou direto —
+o script cria o schema se precisar):
+
+```bash
+python scripts/create_admin.py --email voce@empresa.com --name "Seu Nome"
+```
+
+A senha é a padrão `quality_{ano_atual}` (ou passe `--password`). Troque depois
+do primeiro login. Dentro do Docker:
+`docker compose exec quality python scripts/create_admin.py --email voce@empresa.com`.
+
+### Dados de demonstração (opcional)
+
+```bash
+python scripts/seed_demo_data.py
+```
+
+Popula um banco **vazio** com 10 supervisores, 100 técnicos, 13 contas viewer e
+300–700 avaliações fictícias (2024-01 a 2026-08), semente fixa. Só adiciona: se
+já houver supervisores/técnicos, aborta sem alterar nada.
+
 ## Estrutura
 
 ```
@@ -36,6 +60,9 @@ quality_system/
 │   └── favicon.png                  # Ícone da aba do navegador (page_icon)
 ├── .streamlit/
 │   └── config.toml                  # Tema dark + paleta de marca
+├── scripts/
+│   ├── create_admin.py              # Cria o primeiro admin num banco novo
+│   └── seed_demo_data.py            # Dados fictícios de demonstração (só em banco vazio)
 ├── core/                            # Infra do app — nada aqui conhece páginas específicas
 │   ├── db.py                        # Conexão genérica com o SQLite local (SQLAlchemy) + criação do schema
 │   ├── config.py                    # Nomes de tabelas + catálogo padrão de critérios/pilares (seed)
